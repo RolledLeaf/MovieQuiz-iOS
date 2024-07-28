@@ -4,8 +4,14 @@ final class MovieQuizViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+         func show(quiz step: QuizStepViewModel) {
+          imageView.image = step.image
+          textLabel.text = step.question
+          counterLabel.text = step.questionNumber
+        }
     }
-    
+    //Аутлеты взаимодействия
     @IBAction private func noButton(_ sender: Any) {
     }
     
@@ -20,9 +26,7 @@ final class MovieQuizViewController: UIViewController {
 }
 
 
-
-
-
+// Структура данных вопросов
 struct QuizQuestion {
     let image: String
     // строка с названием фильма,
@@ -33,6 +37,17 @@ struct QuizQuestion {
     // булевое значение (true, false), правильный ответ на вопрос
 }
 
+//Модель для экрана
+struct QuizStepViewModel {
+  let image: UIImage
+  let question: String
+  let questionNumber: String
+}
+
+
+
+
+//Мокапы
 private let questions: [QuizQuestion] = [
     QuizQuestion(image: "The Godfater", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: true),
     QuizQuestion(image: "The Dark Knight", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: true),
@@ -45,6 +60,20 @@ private let questions: [QuizQuestion] = [
     QuizQuestion(image: "Tesla", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: false),
     QuizQuestion(image: "Vivarium", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: false)
 ]
+
+//Номер текущего вопроса
+private var currentQuestionIndex = 0
+
+//Количество правильных ответов
+private var correctAnswers = 0
+
+private func convert(model: QuizQuestion) -> QuizStepViewModel {
+    let questionStep = QuizStepViewModel(image: UIImage(named: model.image) ?? UIImage(), question: model.text, questionNumber: "\(currentQuestionIndex + 1)/\(questions.count)")
+    return questionStep
+}
+
+// приватный метод вывода на экран вопроса, который принимает на вход вью модель вопроса и ничего не возвращает
+
 
 /*
  Mock-данные
@@ -108,4 +137,4 @@ private let questions: [QuizQuestion] = [
  Настоящий рейтинг: 5,8
  Вопрос: Рейтинг этого фильма больше чем 6?
  Ответ: НЕТ
-*/
+ */
