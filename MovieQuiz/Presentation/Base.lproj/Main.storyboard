@@ -28,7 +28,7 @@
                                     <stackView opaque="NO" contentMode="scaleToFill" spacing="17" translatesAutoresizingMaskIntoConstraints="NO" id="scb-Ka-PXG">
                                         <rect key="frame" x="0.0" y="0.0" width="374" height="23.5"/>
                                         <subviews>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Question Title Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="k8E-kQ-cHJ">
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Вопрос" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="k8E-kQ-cHJ">
                                                 <rect key="frame" x="0.0" y="0.0" width="256.5" height="23.5"/>
                                                 <fontDescription key="fontDescription" name="YSDisplay-Medium" family="YS Display" pointSize="20"/>
                                                 <color key="textColor" name="YP White"/>
@@ -104,6 +104,7 @@
                                 <constraints>
                                     <constraint firstAttribute="trailing" secondItem="1OP-o7-J0H" secondAttribute="trailing" id="KVc-4o-tGw"/>
                                     <constraint firstAttribute="trailing" secondItem="scb-Ka-PXG" secondAttribute="trailing" id="TyL-Kv-6S2"/>
+                                    <constraint firstItem="1OP-o7-J0H" firstAttribute="top" secondItem="scb-Ka-PXG" secondAttribute="bottom" constant="20" id="XaG-uj-RfG"/>
                                     <constraint firstAttribute="trailing" secondItem="RrP-cc-t9D" secondAttribute="trailing" id="rB6-Uo-MK8"/>
                                     <constraint firstAttribute="trailing" secondItem="9Au-jh-jSy" secondAttribute="trailing" id="xiv-Gc-Ajw"/>
                                 </constraints>
