@@ -1,8 +1,6 @@
 import UIKit
 
 final class MovieQuizViewController: UIViewController {
-
-    
     
     struct QuizStepViewModel {
         let image: UIImage
@@ -16,18 +14,9 @@ final class MovieQuizViewController: UIViewController {
         let correctAnswer: Bool
     }
     
-    
-    @IBAction private func noButtonTapped(_ sender: Any) {
-        showAnswerResult(false)
-    }
-    
-
-    @IBAction private func yesButtonTapped(_ sender: Any) {
-        showAnswerResult(true)
-    }
-    
    
     
+ 
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var counterLabel: UILabel!
     @IBOutlet private var textLabel: UILabel!
@@ -50,8 +39,20 @@ final class MovieQuizViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-      
+        
+        let firstStep = convert(model: questions[currentQuestionIndex])
+        show(firstStep)
     }
+    
+    @IBAction private func noButtonTapped(_ sender: Any) {
+        showAnswerResult(false)
+    }
+    
+    
+    @IBAction private func yesButtonTapped(_ sender: Any) {
+        showAnswerResult(true)
+    }
+    
     
     // Конвертация QuizQuestion в QuizStepViewModel
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
@@ -94,21 +95,25 @@ final class MovieQuizViewController: UIViewController {
             // Завершение викторины
             if self.currentQuestionIndex == self.questions.count - 1 {
                 let alert = UIAlertController(title: "Этот раунд окончен",
-                                                          message: "Ваш результат \(self.correctAnswers)/10 ",
-                                                          preferredStyle: .alert)
-                            let action = UIAlertAction(title: "Сыграть ещё раз?", style: .default) { _ in
-                                self.resetQuiz()
-                            }
-                            
-                            alert.addAction(action)
-                            self.present(alert, animated: true, completion: nil)
-            
+                                              message: "Ваш результат \(self.correctAnswers)/10 ",
+                                              preferredStyle: .alert)
+                let action = UIAlertAction(title: "Сыграть ещё раз?", style: .default) { _ in
+                    self.resetQuiz()
+                }
+                
+                alert.addAction(action)
+                self.present(alert, animated: true, completion: nil)
+                
             } else {
                 self.currentQuestionIndex += 1
-                
-                let nextQuestion = self.questions[self.currentQuestionIndex]
-                let viewModel = self.convert(model: nextQuestion)
-                self.show(viewModel)
+                if self.currentQuestionIndex < self.questions.count {
+                    let nextQuestion = self.questions[self.currentQuestionIndex]
+                    let viewModel = self.convert(model: nextQuestion)
+                    self.show(viewModel)
+                } else {
+                    
+                    print("Индекс вне предела массива")
+                }
             }
         }
     }
