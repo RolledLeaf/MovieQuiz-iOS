@@ -50,7 +50,6 @@ final class MovieQuizViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
       
     }
     
@@ -92,25 +91,24 @@ final class MovieQuizViewController: UIViewController {
         
         // Переход к следующему вопросу после задержки
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            
-            self.currentQuestionIndex += 1
-            
-            if self.currentQuestionIndex < self.questions.count {
-                let nextStep = self.convert(model: self.questions[self.currentQuestionIndex])
-                self.show(nextStep)
-            } else {
-                
-                // Завершение викторины
+            // Завершение викторины
+            if self.currentQuestionIndex == self.questions.count - 1 {
                 let alert = UIAlertController(title: "Этот раунд окончен",
-                                              message: "Ваш результат \(self.correctAnswers)/10 ",
-                                              preferredStyle: .alert)
-                let action = UIAlertAction(title: "Сыграть ещё раз?", style: .default) { _ in
-                    self.resetQuiz()
-                }
+                                                          message: "Ваш результат \(self.correctAnswers)/10 ",
+                                                          preferredStyle: .alert)
+                            let action = UIAlertAction(title: "Сыграть ещё раз?", style: .default) { _ in
+                                self.resetQuiz()
+                            }
+                            
+                            alert.addAction(action)
+                            self.present(alert, animated: true, completion: nil)
+            
+            } else {
+                self.currentQuestionIndex += 1
                 
-                alert.addAction(action)
-                
-                self.present(alert, animated: true, completion: nil)
+                let nextQuestion = self.questions[self.currentQuestionIndex]
+                let viewModel = self.convert(model: nextQuestion)
+                self.show(viewModel)
             }
         }
     }
