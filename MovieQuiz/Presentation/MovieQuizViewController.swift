@@ -3,6 +3,7 @@ import UIKit
 final class MovieQuizViewController: UIViewController {
 
     
+    
     struct QuizStepViewModel {
         let image: UIImage
         let question: String
@@ -15,13 +16,17 @@ final class MovieQuizViewController: UIViewController {
         let correctAnswer: Bool
     }
     
-    @IBAction private func noButton(_ sender: Any) {
+    
+    @IBAction private func noButtonTapped(_ sender: Any) {
         showAnswerResult(false)
     }
     
-    @IBAction private func yesButton(_ sender: Any) {
+
+    @IBAction private func yesButtonTapped(_ sender: Any) {
         showAnswerResult(true)
     }
+    
+   
     
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var counterLabel: UILabel!
@@ -46,9 +51,7 @@ final class MovieQuizViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Показ первого вопроса при загрузке
-        let firstStep = convert(model: questions[currentQuestionIndex])
-        show(firstStep)
+      
     }
     
     // Конвертация QuizQuestion в QuizStepViewModel
@@ -75,14 +78,14 @@ final class MovieQuizViewController: UIViewController {
         if currentQuestion.correctAnswer == isCorrect {
             correctAnswers += 1
             // Красим рамку в зеленый цвет при правильном ответе
-            imageView.layer.borderColor = UIColor.green.cgColor
-            imageView.layer.cornerRadius = 6 // радиус скругления углов рамки
-            imageView.layer.borderWidth = 5.0
+            imageView.layer.borderColor = UIColor.ypGreen.cgColor
+            imageView.layer.cornerRadius = 20
+            imageView.layer.borderWidth = 8
         } else {
             // Красим рамку в красный цвет при неправильном ответе
-            imageView.layer.borderColor = UIColor.red.cgColor
-            imageView.layer.cornerRadius = 6 // радиус скругления углов рамки
-            imageView.layer.borderWidth = 5.0
+            imageView.layer.borderColor = UIColor.ypRed.cgColor
+            imageView.layer.cornerRadius = 20
+            imageView.layer.borderWidth = 8
         }
         
         
@@ -98,22 +101,18 @@ final class MovieQuizViewController: UIViewController {
             } else {
                 
                 // Завершение викторины
-                let alert = UIAlertController(title: "Этот раунд окончен", // заголовок всплывающего окна
-                                              message: "Ваш результат \(self.correctAnswers)/10 ", // текст во всплывающем окне
+                let alert = UIAlertController(title: "Этот раунд окончен",
+                                              message: "Ваш результат \(self.correctAnswers)/10 ",
                                               preferredStyle: .alert)
                 let action = UIAlertAction(title: "Сыграть ещё раз?", style: .default) { _ in
                     self.resetQuiz()
-                    
                 }
-                // добавляем в алерт кнопку
+                
                 alert.addAction(action)
                 
-                // показываем всплывающее окно
                 self.present(alert, animated: true, completion: nil)
             }
         }
-        
-        
     }
     private func resetQuiz() {
         currentQuestionIndex = 0

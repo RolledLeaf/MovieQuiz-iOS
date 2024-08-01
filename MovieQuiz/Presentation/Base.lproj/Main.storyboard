@@ -72,7 +72,7 @@
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
                                                 <connections>
-                                                    <action selector="yesButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="37b-0f-uYY"/>
+                                                    <action selector="yesButtonTapped:" destination="BYZ-38-t0r" eventType="touchDown" id="KeZ-Jg-VL6"/>
                                                 </connections>
                                             </button>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Gc0-1V-MCQ">
@@ -92,10 +92,15 @@
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
                                                 <connections>
-                                                    <action selector="noButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="pyn-td-m8V"/>
+                                                    <action selector="noButtonTapped:" destination="BYZ-38-t0r" eventType="touchDown" id="1Dz-4E-88a"/>
                                                 </connections>
                                             </button>
                                         </subviews>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                                <integer key="value" value="15"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
                                     </stackView>
                                 </subviews>
                             </stackView>
