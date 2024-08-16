@@ -96,7 +96,8 @@ final class MovieQuizViewController: UIViewController {
         yesButton.isEnabled = false
         
         // Переход к следующему вопросу после задержки
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            [weak self] in guard let self else {return}
             self.noButton.isEnabled = true
             self.yesButton.isEnabled = true
             
