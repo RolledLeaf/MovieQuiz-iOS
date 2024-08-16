@@ -14,8 +14,14 @@ final class MovieQuizViewController: UIViewController {
         let correctAnswer: Bool
     }
     
-    
-    
+    struct QuizResultsViewModel {
+      // строка с заголовком алерта
+      let title: String
+      // строка с текстом о количестве набранных очков
+      let text: String
+      // текст для кнопки алерта
+      let buttonText: String
+    }
     
     @IBOutlet weak var noButton: UIButton!
     @IBOutlet weak var yesButton: UIButton!
@@ -35,6 +41,7 @@ final class MovieQuizViewController: UIViewController {
         QuizQuestion(image: "Tesla", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: false),
         QuizQuestion(image: "Vivarium", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: false)
     ]
+    
     
     private var currentQuestionIndex = 0
     private var correctAnswers = 0
@@ -74,6 +81,22 @@ final class MovieQuizViewController: UIViewController {
         imageView.layer.borderColor = UIColor.clear.cgColor
     }
     
+    private func showResult(quiz result: QuizResultsViewModel) {
+        let alert = UIAlertController(
+            title: result.title,
+            message: result.text,
+            preferredStyle: .alert)
+        
+        let action = UIAlertAction(title: result.buttonText, style: .default) { _ in self.resetQuiz()
+    
+            let firstQuestion = self.questions[self.currentQuestionIndex]
+                    let viewModel = self.convert(model: firstQuestion)
+                    self.show(viewModel)
+        }
+        alert.addAction(action)
+           
+           self.present(alert, animated: true, completion: nil)
+    } // конец функции showResults
   
     private func showAnswerResult(_ isCorrect: Bool) {
         let currentQuestion = questions[currentQuestionIndex]
@@ -103,15 +126,12 @@ final class MovieQuizViewController: UIViewController {
             
             // Завершение викторины
             if self.currentQuestionIndex == self.questions.count - 1 {
-                let alert = UIAlertController(title: "Этот раунд окончен",
-                                              message: "Ваш результат \(self.correctAnswers)/10 ",
-                                              preferredStyle: .alert)
-                let action = UIAlertAction(title: "Сыграть ещё раз?", style: .default) { _ in
-                    self.resetQuiz()
-                }
-                
-                alert.addAction(action)
-                self.present(alert, animated: true, completion: nil)
+                let text = "Ваш результат: \(correctAnswers)/10" // 1
+                        let viewModel = QuizResultsViewModel( // 2
+                            title: "Этот раунд окончен!",
+                            text: text,
+                            buttonText: "Сыграть ещё раз")
+                        showResult(quiz: viewModel) // 3
                 // Переход к следующему вопросу
             } else {
                 self.currentQuestionIndex += 1
