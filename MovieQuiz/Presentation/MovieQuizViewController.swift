@@ -10,8 +10,9 @@ final class MovieQuizViewController: UIViewController {
     @IBOutlet private var counterLabel: UILabel!
     @IBOutlet private var textLabel: UILabel!
     
-   
-    
+    private let questionsAmount: Int = 10
+    private var questionFactory: QuestionFactory = QuestionFactory()
+    private var currentQuestion: QuizQuestion?
     
     private var currentQuestionIndex = 0
     private var correctAnswers = 0
@@ -19,8 +20,12 @@ final class MovieQuizViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let firstStep = convert(model: questions[currentQuestionIndex])
-        show(firstStep)
+        if let firstStep = questionFactory.requestNextQuestion() {
+            currentQuestion = firstStep
+            let viewModel = convert(model: firstStep)
+            show(viewModel)
+        }
+      
     }
     
     @IBAction private func noButtonTapped(_ sender: Any) {
@@ -34,12 +39,12 @@ final class MovieQuizViewController: UIViewController {
     }
     
     
-    
+    //Исправил count на questionsAmount
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
         return QuizStepViewModel(
             image: UIImage(named: model.image) ?? UIImage(),
             question: model.text,
-            questionNumber: "\(currentQuestionIndex + 1)/\(questions.count)")
+            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
     }
     
    
@@ -59,17 +64,24 @@ final class MovieQuizViewController: UIViewController {
         
         let action = UIAlertAction(title: result.buttonText, style: .default) { _ in self.resetQuiz()
     
-            let firstQuestion = self.questions[self.currentQuestionIndex]
-                    let viewModel = self.convert(model: firstQuestion)
-                    self.show(viewModel)
+            if let firstQuestion = self.questionFactory.requestNextQuestion() {
+                self.currentQuestion = firstQuestion
+                let viewModel = self.convert(model: firstQuestion)
+
+                self.show(viewModel)
+            }
         }
         alert.addAction(action)
            
            self.present(alert, animated: true, completion: nil)
     } // конец функции showResults
   
+    
+    //Исправлено questions[currentQuestionIndex] на currentQuestion
     private func showAnswerResult(_ isCorrect: Bool) {
-        let currentQuestion = questions[currentQuestionIndex]
+        guard let currentQuestion = currentQuestion else {
+            return
+        }
         
         if currentQuestion.correctAnswer == isCorrect {
             correctAnswers += 1
@@ -95,7 +107,7 @@ final class MovieQuizViewController: UIViewController {
             self.yesButton.isEnabled = true
             
             // Завершение викторины
-            if self.currentQuestionIndex == self.questions.count - 1 {
+            if self.currentQuestionIndex == self.questionsAmount - 1 {
                 let text = "Ваш результат: \(correctAnswers)/10" // 1
                         let viewModel = QuizResultsViewModel( // 2
                             title: "Этот раунд окончен!",
@@ -105,10 +117,11 @@ final class MovieQuizViewController: UIViewController {
                 // Переход к следующему вопросу
             } else {
                 self.currentQuestionIndex += 1
-                if self.currentQuestionIndex < self.questions.count {
-                    let nextQuestion = self.questions[self.currentQuestionIndex]
-                    let viewModel = self.convert(model: nextQuestion)
-                    self.show(viewModel)
+                if self.currentQuestionIndex < self.questionsAmount {
+                    if let nextQuestion = self.questionFactory.requestNextQuestion() {
+                        let viewModel = self.convert(model: nextQuestion)
+                        self.show(viewModel)
+                }
                 } else {
                     
                     print("Индекс вне предела массива")
@@ -119,7 +132,11 @@ final class MovieQuizViewController: UIViewController {
     private func resetQuiz() {
         currentQuestionIndex = 0
         correctAnswers = 0
-        let firstStep = convert(model: questions[currentQuestionIndex])
-        show(firstStep)
+        if let firstStep = questionFactory.requestNextQuestion() {
+            currentQuestion = firstStep
+            let viewModel = convert(model: firstStep)
+            show(viewModel)
+        }
+        
     }
 }
