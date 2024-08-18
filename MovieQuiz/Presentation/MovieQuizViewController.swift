@@ -1,6 +1,6 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController {
+final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     
     
@@ -19,15 +19,26 @@ final class MovieQuizViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        if let firstStep = questionFactory.requestNextQuestion() {
-            currentQuestion = firstStep
-            let viewModel = convert(model: firstStep)
-            show(viewModel)
-        }
+        questionFactory.setup(delegate: self) // Устанавливаем делегат
+            questionFactory.requestNextQuestion() // Запрашиваем первый вопрос
       
     }
     
+    // MARK: - QuestionFactoryDelegate
+    func didReceiveNextQuestion(question: QuizQuestion?) {
+        guard let question = question else {
+            return
+        }
+            currentQuestion = question
+            let viewModel = convert(model: question)
+        
+        DispatchQueue.main.async { [weak self] in
+                self?.show(viewModel)
+            }
+        
+    }
+    
+ 
     @IBAction private func noButtonTapped(_ sender: Any) {
         showAnswerResult(false)
         
@@ -64,12 +75,7 @@ final class MovieQuizViewController: UIViewController {
         
         let action = UIAlertAction(title: result.buttonText, style: .default) { _ in self.resetQuiz()
     
-            if let firstQuestion = self.questionFactory.requestNextQuestion() {
-                self.currentQuestion = firstQuestion
-                let viewModel = self.convert(model: firstQuestion)
-
-                self.show(viewModel)
-            }
+            self.questionFactory.requestNextQuestion()
         }
         alert.addAction(action)
            
@@ -118,10 +124,7 @@ final class MovieQuizViewController: UIViewController {
             } else {
                 self.currentQuestionIndex += 1
                 if self.currentQuestionIndex < self.questionsAmount {
-                    if let nextQuestion = self.questionFactory.requestNextQuestion() {
-                        let viewModel = self.convert(model: nextQuestion)
-                        self.show(viewModel)
-                }
+                    questionFactory.requestNextQuestion()
                 } else {
                     
                     print("Индекс вне предела массива")
@@ -132,11 +135,7 @@ final class MovieQuizViewController: UIViewController {
     private func resetQuiz() {
         currentQuestionIndex = 0
         correctAnswers = 0
-        if let firstStep = questionFactory.requestNextQuestion() {
-            currentQuestion = firstStep
-            let viewModel = convert(model: firstStep)
-            show(viewModel)
-        }
+        questionFactory.requestNextQuestion()
         
     }
 }
