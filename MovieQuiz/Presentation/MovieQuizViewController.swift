@@ -10,6 +10,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet private var counterLabel: UILabel!
     @IBOutlet private var textLabel: UILabel!
     
+    private var alertPresenter: AlertPresenter?
     private let questionsAmount: Int = 10
     private var questionFactory: QuestionFactoryProtocol = QuestionFactory()
     private var currentQuestion: QuizQuestion?
@@ -21,6 +22,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         super.viewDidLoad()
         questionFactory.setup(delegate: self) // Устанавливаем делегат
             questionFactory.requestNextQuestion() // Запрашиваем первый вопрос
+        
+        alertPresenter = AlertPresenter(viewController: self)
       
     }
     
@@ -68,18 +71,15 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     private func showResult(quiz result: QuizResultsViewModel) {
-        let alert = UIAlertController(
+        let alertModel = AlertModel(
             title: result.title,
             message: result.text,
-            preferredStyle: .alert)
+            buttonText: result.buttonText) { [weak self] in
+                self?.resetQuiz()
+            }
         
-        let action = UIAlertAction(title: result.buttonText, style: .default) { _ in self.resetQuiz()
+        alertPresenter?.showAlert(model: alertModel)
     
-            self.questionFactory.requestNextQuestion()
-        }
-        alert.addAction(action)
-           
-           self.present(alert, animated: true, completion: nil)
     } // конец функции showResults
   
     
