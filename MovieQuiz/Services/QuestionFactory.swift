@@ -5,10 +5,11 @@ import Foundation
 
 class QuestionFactory: QuestionFactoryProtocol {
     weak var delegate: QuestionFactoryDelegate?
-
-       func setup(delegate: QuestionFactoryDelegate) {
-           self.delegate = delegate
-       }
+    
+    func setup(delegate: QuestionFactoryDelegate) {
+        self.delegate = delegate
+        remainingQuestions = questions.shuffled()
+    }
     
     private let questions: [QuizQuestion] = [
         QuizQuestion(image: "The Godfather", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: true),
@@ -22,21 +23,19 @@ class QuestionFactory: QuestionFactoryProtocol {
         QuizQuestion(image: "Tesla", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: false),
         QuizQuestion(image: "Vivarium", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: false)
     ]
- 
     
-    //свойство с делегатом, с которым будет общаться фабрика
-   
+    private var remainingQuestions: [QuizQuestion] = []
+    
     
     var questionsCount: Int {
-            return questions.count
-        }
+        return questions.count
+    }
     
     func requestNextQuestion()  {
-        guard let index = (0..<questions.count).randomElement() else {
-            delegate?.didReceiveNextQuestion(question: nil)
-            return
+        if remainingQuestions.isEmpty {
+            remainingQuestions = questions.shuffled()
         }
-        let question = questions[safe: index]
+        let question = remainingQuestions.removeFirst()
         delegate?.didReceiveNextQuestion(question: question)
     }
     

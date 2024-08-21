@@ -18,6 +18,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private var currentQuestionIndex = 0
     private var correctAnswers = 0
     
+    //Создал экземпляр класса StatisticService
     private var statisticService: StatisticServiceProtocol = StatisticService()
     
     override func viewDidLoad() {
@@ -82,10 +83,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
         alertPresenter?.showAlert(model: alertModel)
         
-    } // конец функции showResults
+    }
     
-    
-    //Исправлено questions[currentQuestionIndex] на currentQuestion
     private func showAnswerResult(_ isCorrect: Bool) {
         guard let currentQuestion = currentQuestion else {
             return
@@ -115,13 +114,19 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             self.yesButton.isEnabled = true
             
             // Завершение викторины
+            
             if self.currentQuestionIndex == self.questionsAmount - 1 {
                 self.statisticService.store(correctAnswers: self.correctAnswers, totalQuestions: self.questionsAmount, date: Date())
                 // Получаем сохраненные данные
                 let gamesCount = self.statisticService.gamesCount
                 let bestGame = self.statisticService.bestGame
                 let totalAccuracy = String(format: "%.2f", self.statisticService.totalAccuracy)
-                let text = "Ваш результат: \(correctAnswers)/10 \n Количесвто отыгранных квизов:\(gamesCount) \n Рекорд: \(bestGame.correctAnswers)/\(bestGame.totalQuestions) \n Средняя точность: \(totalAccuracy)%"
+                
+                // Настройка отображения формата даты и времени
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "dd.MM.yyyy HH:mm"
+                let formattedDate = dateFormatter.string(from: bestGame.date)
+                let text = "Ваш результат: \(correctAnswers)/10 \n Количесвто отыгранных квизов:\(gamesCount) \n Рекорд: \(bestGame.correctAnswers)/\(bestGame.totalQuestions), \(formattedDate) \n Средняя точность: \(totalAccuracy)%"
                 let viewModel = QuizResultsViewModel( // 2
                     title: "Этот раунд окончен!",
                     text: text,

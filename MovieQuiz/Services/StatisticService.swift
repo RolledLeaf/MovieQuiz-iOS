@@ -49,15 +49,14 @@ extension StatisticService: StatisticServiceProtocol {
             storage.set(newValue, forKey: Keys.totalAccuracy.rawValue)
         }
     }
-
+    
     func store(correctAnswers: Int, totalQuestions: Int, date: Date) {
-        
         gamesCount += 1
         
         let newAccuracy = Double(correctAnswers) / Double(totalQuestions) * 100
         totalAccuracy = ((totalAccuracy * Double(gamesCount - 1)) + newAccuracy) / Double(gamesCount)
         
-       
+        
         if correctAnswers > bestGame.correctAnswers {
             bestGame = GameResult(correctAnswers: correctAnswers, totalQuestions: totalQuestions, date: date)
         }
