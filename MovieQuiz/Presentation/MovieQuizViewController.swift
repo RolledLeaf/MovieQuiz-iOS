@@ -2,8 +2,6 @@ import UIKit
 
 final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
-    
-    
     @IBOutlet weak var noButton: UIButton!
     @IBOutlet weak var yesButton: UIButton!
     @IBOutlet private var imageView: UIImageView!
@@ -17,17 +15,16 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private var currentQuestionIndex = 0
     private var correctAnswers = 0
-    
     //Создал экземпляр класса StatisticService
     private var statisticService: StatisticServiceProtocol = StatisticService()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        imageView.layer.cornerRadius = 20
         questionFactory.setup(delegate: self) // Устанавливаем делегат
         questionFactory.requestNextQuestion() // Запрашиваем первый вопрос
         
         alertPresenter = AlertPresenter(viewController: self)
-        
     }
     
     // MARK: - QuestionFactoryDelegate
@@ -37,24 +34,18 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
         currentQuestion = question
         let viewModel = convert(model: question)
-        
         DispatchQueue.main.async { [weak self] in
             self?.show(viewModel)
         }
-        
     }
-    
     
     @IBAction private func noButtonTapped(_ sender: Any) {
         showAnswerResult(false)
-        
     }
-    
     
     @IBAction private func yesButtonTapped(_ sender: Any) {
         showAnswerResult(true)
     }
-    
     
     //Исправил count на questionsAmount
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
@@ -63,7 +54,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             question: model.text,
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
     }
-    
     
     private func show(_ step: QuizStepViewModel) {
         imageView.image = step.image
@@ -80,9 +70,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             buttonText: result.buttonText) { [weak self] in
                 self?.resetQuiz()
             }
-        
         alertPresenter?.showAlert(model: alertModel)
-        
     }
     
     private func showAnswerResult(_ isCorrect: Bool) {
@@ -102,8 +90,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             imageView.layer.cornerRadius = 20
             imageView.layer.borderWidth = 8
         }
-        
-        
         noButton.isEnabled = false
         yesButton.isEnabled = false
         
@@ -112,21 +98,23 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             [weak self] in guard let self else {return}
             self.noButton.isEnabled = true
             self.yesButton.isEnabled = true
-            
             // Завершение викторины
-            
             if self.currentQuestionIndex == self.questionsAmount - 1 {
                 self.statisticService.store(correctAnswers: self.correctAnswers, totalQuestions: self.questionsAmount, date: Date())
                 // Получаем сохраненные данные
                 let gamesCount = self.statisticService.gamesCount
                 let bestGame = self.statisticService.bestGame
                 let totalAccuracy = String(format: "%.2f", self.statisticService.totalAccuracy)
-                
                 // Настройка отображения формата даты и времени
                 let dateFormatter = DateFormatter()
                 dateFormatter.dateFormat = "dd.MM.yyyy HH:mm"
                 let formattedDate = dateFormatter.string(from: bestGame.date)
-                let text = "Ваш результат: \(correctAnswers)/10 \n Количесвто отыгранных квизов:\(gamesCount) \n Рекорд: \(bestGame.correctAnswers)/\(bestGame.totalQuestions), \(formattedDate) \n Средняя точность: \(totalAccuracy)%"
+                let text = """
+                Ваш результат: \(correctAnswers)/10
+                Количесвто отыгранных квизов:\(gamesCount)
+                Рекорд: \(bestGame.correctAnswers)/\(bestGame.totalQuestions), \(formattedDate)
+                Средняя точность: \(totalAccuracy)%
+                """
                 let viewModel = QuizResultsViewModel( // 2
                     title: "Этот раунд окончен!",
                     text: text,
@@ -138,16 +126,15 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                 if self.currentQuestionIndex < self.questionsAmount {
                     questionFactory.requestNextQuestion()
                 } else {
-                    
                     print("Индекс вне предела массива")
                 }
             }
         }
     }
+    
     private func resetQuiz() {
         currentQuestionIndex = 0
         correctAnswers = 0
         questionFactory.requestNextQuestion()
-        
     }
 }

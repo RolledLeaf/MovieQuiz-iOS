@@ -1,7 +1,3 @@
-
-//  Created by Vitaly Wexler on 21.08.2024.
-
-
 import Foundation
 
 final class StatisticService {
@@ -55,7 +51,6 @@ extension StatisticService: StatisticServiceProtocol {
         
         let newAccuracy = Double(correctAnswers) / Double(totalQuestions) * 100
         totalAccuracy = ((totalAccuracy * Double(gamesCount - 1)) + newAccuracy) / Double(gamesCount)
-        
         
         if correctAnswers > bestGame.correctAnswers {
             bestGame = GameResult(correctAnswers: correctAnswers, totalQuestions: totalQuestions, date: date)
