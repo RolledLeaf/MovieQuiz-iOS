@@ -7,6 +7,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var counterLabel: UILabel!
     @IBOutlet private var textLabel: UILabel!
+    @IBOutlet private var activityIndicator: UIActivityIndicatorView!
+   
     
     private var alertPresenter: AlertPresenter?
     private let questionsAmount: Int = 10
@@ -46,6 +48,25 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBAction private func yesButtonTapped(_ sender: Any) {
         showAnswerResult(true)
     }
+    
+    private func showNetworkError(message: String) {
+        hideLoadingIndicator() // скрываем индикатор загрузки
+        let model = AlertModel(title: "Ошибка", message: message, buttonText: "Попробовать ещё раз") { [weak self] in
+            guard let self = self else { return }
+            
+            self.currentQuestionIndex = 0
+            self.correctAnswers = 0
+        }
+        
+    
+    }
+    private func hideLoadingIndicator() {
+        activityIndicator.isHidden = true
+    }
+    private func showLoadingIndicator() {
+        activityIndicator.isHidden = false // говорим, что индикатор загрузки не скрыт
+        activityIndicator.startAnimating() // включаем анимацию
+    } 
     
     //Исправил count на questionsAmount
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
