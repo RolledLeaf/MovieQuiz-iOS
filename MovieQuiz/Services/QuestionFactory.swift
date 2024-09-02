@@ -2,7 +2,26 @@ import Foundation
 
 final class QuestionFactory: QuestionFactoryProtocol {
     weak var delegate: QuestionFactoryDelegate?
+    private let moviesLoader: MoviesLoading
+    private var movies: [MostPopularMovie] = []
     
+    init(delegate: QuestionFactoryDelegate?, moviesLoader: MoviesLoading) {
+        self.delegate = delegate
+        self.moviesLoader = moviesLoader
+    }
+    
+    func loadData() {
+        moviesLoader.loadMovies { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let mostPopularMovies):
+                self.movies = mostPopularMovies.items // сохраняем фильм в нашу новую переменную
+                self.delegate?.didLoadDataFromServer() // сообщаем, что данные загрузились
+            case .failure(let error):
+                self.delegate?.didFailToLoadData(with: error) // сообщаем об ошибке нашему MovieQuizViewController
+            }
+        }
+    }
     func setup(delegate: QuestionFactoryDelegate) {
         self.delegate = delegate
         remainingQuestions = questions.shuffled()
