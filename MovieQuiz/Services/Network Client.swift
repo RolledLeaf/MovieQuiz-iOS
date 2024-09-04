@@ -1,7 +1,6 @@
 import Foundation
 
 struct NetworkClient {
-    
     // Перечисление для описания возможных сетевых ошибок
     private enum NetworkError: Error {
         case codeError // Ошибка, связанная с неподходящим статус-кодом ответа

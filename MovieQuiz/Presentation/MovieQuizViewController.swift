@@ -8,7 +8,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet private var counterLabel: UILabel!
     @IBOutlet private var textLabel: UILabel!
     @IBOutlet private var activityIndicator: UIActivityIndicatorView!
-   
     
     private var alertPresenter: AlertPresenter?
     private let questionsAmount: Int = 10
@@ -22,21 +21,18 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        showLoadingIndicator()
         imageView.layer.cornerRadius = 20
         // Инициализируем moviesLoader
+        let moviesLoader = MoviesLoader()
+        // Инициализируем questionFactory с правильными параметрами
+        questionFactory = QuestionFactory(delegate: self, moviesLoader: moviesLoader)
         
-        showLoadingIndicator()
-            let moviesLoader = MoviesLoader()
-            
-            // Инициализируем questionFactory с правильными параметрами
-            questionFactory = QuestionFactory(delegate: self, moviesLoader: moviesLoader)
-            
-            questionFactory.loadData() // Запрашиваем данные
-            alertPresenter = AlertPresenter(viewController: self)
+        questionFactory.loadData() // Запрашиваем данные
+        alertPresenter = AlertPresenter(viewController: self)
         
         questionFactory.setup(delegate: self) // Устанавливаем делегат
         questionFactory.requestNextQuestion() // Запрашиваем первый вопрос
-        
         alertPresenter = AlertPresenter(viewController: self)
     }
     
@@ -61,27 +57,32 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     private func showNetworkError(message: String) {
-        hideLoadingIndicator() // скрываем индикатор загрузки
-        let model = AlertModel(title: "Ошибка", message: message, buttonText: "Попробовать ещё раз") { [weak self] in
+        DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            
-            self.currentQuestionIndex = 0
-            self.correctAnswers = 0
-            // Возможно, стоит повторить загрузку данных
-                  self.questionFactory.requestNextQuestion()
-              }
-              
-              alertPresenter?.showAlert(model: model)
+            hideLoadingIndicator() // скрываем индикатор загрузки
+            let model = AlertModel(title: "Ошибка зарузки данных",
+                                   message: "Отсутствует интернет соединение",
+                                   buttonText: "Попробовать ещё раз") { [weak self] in
+                guard let self = self else { return }
+                
+                self.currentQuestionIndex = 0
+                self.correctAnswers = 0
+                self.questionFactory.loadData()
+            }
+            self.alertPresenter?.showAlert(model: model)
         }
-        
-    private func hideLoadingIndicator() {
-        activityIndicator.isHidden = true
     }
-    private func showLoadingIndicator() {
-        activityIndicator.isHidden = false // говорим, что индикатор загрузки не скрыт
-        activityIndicator.startAnimating() // включаем анимацию
-    } 
-    
+    internal func hideLoadingIndicator() {
+        DispatchQueue.main.async {
+            self.activityIndicator.isHidden = true
+        }
+    }
+    internal func showLoadingIndicator() {
+        DispatchQueue.main.async {
+            self.activityIndicator.isHidden = false
+            self.activityIndicator.startAnimating()
+        }
+    }
     
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
         return QuizStepViewModel(
@@ -116,7 +117,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             self?.questionFactory.requestNextQuestion()
         }
     }
-
+    
     func didFailToLoadData(with error: Error) {
         
         showNetworkError(message: error.localizedDescription)
