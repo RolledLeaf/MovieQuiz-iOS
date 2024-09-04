@@ -48,11 +48,26 @@ final class QuestionFactory: QuestionFactoryProtocol {
     }
     
     func requestNextQuestion()  {
-        if remainingQuestions.isEmpty {
-            remainingQuestions = questions.shuffled()
+        guard !movies.isEmpty else {
+               delegate?.didFailToLoadData(with: NSError(domain: "QuestionFactory", code: -1, userInfo: [NSLocalizedDescriptionKey: "No movies loaded"]))
+               return
+           }
+           
+        guard let movie = movies.randomElement() else {
+            var alertModel = AlertModel(title: "Ошибка", message: "Не удалось загрузить данные о фильмах. Попробуйте позже", buttonText: "Ok", completion: self.requestNextQuestion)
+            return
         }
-        let question = remainingQuestions.removeFirst()
-        delegate?.didReceiveNextQuestion(question: question)
+        
+           let questionText = "Рейтинг фильма \(movie.title) больше чем 6?"
+           let correctAnswer = Double(movie.rating) ?? 0 > 6.0
+           
+           let question = QuizQuestion(
+               image: movie.imageURL.absoluteString, // Здесь нужно будет скачать изображение по URL или использовать заглушку
+               text: questionText,
+               correctAnswer: correctAnswer
+           )
+           
+           delegate?.didReceiveNextQuestion(question: question)
     }
     
 }

@@ -12,7 +12,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private var alertPresenter: AlertPresenter?
     private let questionsAmount: Int = 10
-    private var questionFactory: QuestionFactoryProtocol = QuestionFactory()
+    private var questionFactory: QuestionFactoryProtocol!
     private var currentQuestion: QuizQuestion?
     
     private var currentQuestionIndex = 0
@@ -23,6 +23,15 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         imageView.layer.cornerRadius = 20
+        // Инициализируем moviesLoader
+            let moviesLoader = MoviesLoader()
+            
+            // Инициализируем questionFactory с правильными параметрами
+            questionFactory = QuestionFactory(delegate: self, moviesLoader: moviesLoader)
+            
+            questionFactory.loadData() // Запрашиваем данные
+            alertPresenter = AlertPresenter(viewController: self)
+        
         questionFactory.setup(delegate: self) // Устанавливаем делегат
         questionFactory.requestNextQuestion() // Запрашиваем первый вопрос
         
@@ -56,10 +65,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             
             self.currentQuestionIndex = 0
             self.correctAnswers = 0
+            // Возможно, стоит повторить загрузку данных
+                  self.questionFactory.requestNextQuestion()
+              }
+              
+              alertPresenter?.showAlert(model: model)
         }
         
-    
-    }
     private func hideLoadingIndicator() {
         activityIndicator.isHidden = true
     }
@@ -94,9 +106,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         alertPresenter?.showAlert(model: alertModel)
     }
     
+    //Использование загрузки в главном потоке через асинхронное выполнение
     func didLoadDataFromServer() {
-        activityIndicator.isHidden = true
-        questionFactory?.requestNextQuestion()
+        DispatchQueue.main.async { [weak self] in
+            self?.activityIndicator.isHidden = true
+            self?.questionFactory.requestNextQuestion()
+        }
     }
 
     func didFailToLoadData(with error: Error) {
