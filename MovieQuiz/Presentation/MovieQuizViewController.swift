@@ -24,6 +24,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         super.viewDidLoad()
         imageView.layer.cornerRadius = 20
         // Инициализируем moviesLoader
+        
+        showLoadingIndicator()
             let moviesLoader = MoviesLoader()
             
             // Инициализируем questionFactory с правильными параметрами
@@ -80,10 +82,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         activityIndicator.startAnimating() // включаем анимацию
     } 
     
-    //Исправил count на questionsAmount
+    
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
         return QuizStepViewModel(
-            image: UIImage(named: model.image) ?? UIImage(),
+            image: UIImage(data: model.image) ?? UIImage(),
             question: model.text,
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
     }
@@ -109,12 +111,14 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     //Использование загрузки в главном потоке через асинхронное выполнение
     func didLoadDataFromServer() {
         DispatchQueue.main.async { [weak self] in
+            self?.hideLoadingIndicator()
             self?.activityIndicator.isHidden = true
             self?.questionFactory.requestNextQuestion()
         }
     }
 
     func didFailToLoadData(with error: Error) {
+        
         showNetworkError(message: error.localizedDescription)
     }
     
