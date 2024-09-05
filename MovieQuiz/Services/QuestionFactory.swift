@@ -45,6 +45,9 @@ final class QuestionFactory: QuestionFactoryProtocol {
     }
     
     func requestNextQuestion() {
+        DispatchQueue.main.async { [weak self] in
+            self?.delegate?.showLoadingIndicator()
+        }
         DispatchQueue.global().async { [weak self] in
             guard let self = self else { return }
             let index = (0..<self.movies.count).randomElement() ?? 0
@@ -54,6 +57,10 @@ final class QuestionFactory: QuestionFactoryProtocol {
                 imageData = try Data(contentsOf: movie.imageURL)
             } catch {
                 print("Failed to load image")
+                let alertModel = AlertModel(title: "Image loading error",
+                                            message: "Failed to load image",
+                                            buttonText: "Try again",
+                                            completion: requestNextQuestion)
             }
             let rating = Float(movie.rating) ?? 0
             let text = "Рейтинг фильма \(movie.title) больше 7?"
@@ -62,6 +69,7 @@ final class QuestionFactory: QuestionFactoryProtocol {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.delegate?.didReceiveNextQuestion(question: question)
+                self.delegate?.hideLoadingIndicator()
             }
         }
     }

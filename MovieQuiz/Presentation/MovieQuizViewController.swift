@@ -48,6 +48,31 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
     }
     
+    func didLoadDataFromServer() {
+        DispatchQueue.main.async { [weak self] in
+            self?.hideLoadingIndicator()
+            self?.activityIndicator.isHidden = true
+            self?.questionFactory.requestNextQuestion()
+        }
+    }
+    
+    func didFailToLoadData(with error: Error) {
+        showNetworkError(message: error.localizedDescription)
+    }
+    
+    internal func hideLoadingIndicator() {
+        DispatchQueue.main.async {
+            self.activityIndicator.isHidden = true
+        }
+    }
+    
+    internal func showLoadingIndicator() {
+        DispatchQueue.main.async {
+            self.activityIndicator.isHidden = false
+            self.activityIndicator.startAnimating()
+        }
+    }
+    
     @IBAction private func noButtonTapped(_ sender: Any) {
         showAnswerResult(false)
     }
@@ -72,18 +97,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             self.alertPresenter?.showAlert(model: model)
         }
     }
-    internal func hideLoadingIndicator() {
-        DispatchQueue.main.async {
-            self.activityIndicator.isHidden = true
-        }
-    }
-    internal func showLoadingIndicator() {
-        DispatchQueue.main.async {
-            self.activityIndicator.isHidden = false
-            self.activityIndicator.startAnimating()
-        }
-    }
-    
+ 
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
         return QuizStepViewModel(
             image: UIImage(data: model.image) ?? UIImage(),
@@ -107,20 +121,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                 self?.resetQuiz()
             }
         alertPresenter?.showAlert(model: alertModel)
-    }
-    
-    //Использование загрузки в главном потоке через асинхронное выполнение
-    func didLoadDataFromServer() {
-        DispatchQueue.main.async { [weak self] in
-            self?.hideLoadingIndicator()
-            self?.activityIndicator.isHidden = true
-            self?.questionFactory.requestNextQuestion()
-        }
-    }
-    
-    func didFailToLoadData(with error: Error) {
-        
-        showNetworkError(message: error.localizedDescription)
     }
     
     private func showAnswerResult(_ isCorrect: Bool) {
