@@ -10,11 +10,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet private var activityIndicator: UIActivityIndicatorView!
     
     private var alertPresenter: AlertPresenter?
-    private let questionsAmount: Int = 10
+    private let presenter = MovieQuizPresenter()
     private var questionFactory: QuestionFactoryProtocol!
     private var currentQuestion: QuizQuestion?
-    
-    private var currentQuestionIndex = 0
     private var correctAnswers = 0
     //Создал экземпляр класса StatisticService
     private var statisticService: StatisticServiceProtocol = StatisticService()
@@ -42,7 +40,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             return
         }
         currentQuestion = question
-        let viewModel = convert(model: question)
+        let viewModel = presenter.convert(model: question)
         DispatchQueue.main.async { [weak self] in
             self?.show(viewModel)
         }
@@ -90,19 +88,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                                    buttonText: "Попробовать ещё раз") { [weak self] in
                 guard let self = self else { return }
                 
-                self.currentQuestionIndex = 0
+                presenter.currentQuestionIndex = 0
                 self.correctAnswers = 0
                 self.questionFactory.loadData()
             }
             self.alertPresenter?.showAlert(model: model)
         }
-    }
- 
-    private func convert(model: QuizQuestion) -> QuizStepViewModel {
-        return QuizStepViewModel(
-            image: UIImage(data: model.image) ?? UIImage(),
-            question: model.text,
-            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
     }
     
     private func show(_ step: QuizStepViewModel) {
@@ -149,8 +140,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             self.noButton.isEnabled = true
             self.yesButton.isEnabled = true
             // Завершение викторины
-            if self.currentQuestionIndex == self.questionsAmount - 1 {
-                self.statisticService.store(correctAnswers: self.correctAnswers, totalQuestions: self.questionsAmount, date: Date())
+            if presenter.currentQuestionIndex == presenter.questionsAmount - 1 {
+                self.statisticService.store(correctAnswers: self.correctAnswers, totalQuestions: presenter.questionsAmount, date: Date())
                 // Получаем сохраненные данные
                 let gamesCount = self.statisticService.gamesCount
                 let bestGame = self.statisticService.bestGame
@@ -172,8 +163,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                 showResult(quiz: viewModel) // 3
                 // Переход к следующему вопросу
             } else {
-                self.currentQuestionIndex += 1
-                if self.currentQuestionIndex < self.questionsAmount {
+                presenter.currentQuestionIndex += 1
+                if presenter.currentQuestionIndex < presenter.questionsAmount {
                     questionFactory.requestNextQuestion()
                 } else {
                     print("Индекс вне предела массива")
@@ -183,7 +174,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     private func resetQuiz() {
-        currentQuestionIndex = 0
+        presenter.currentQuestionIndex = 0
         correctAnswers = 0
         questionFactory.requestNextQuestion()
     }

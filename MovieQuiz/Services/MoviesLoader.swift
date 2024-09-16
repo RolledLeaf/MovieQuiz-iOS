@@ -7,7 +7,10 @@ protocol MoviesLoading {
 
 struct MoviesLoader: MoviesLoading {
     // MARK: - NetworkClient
-    private let networkClient = NetworkClient() // Создаем экземпляр сетевого клиента
+    private let networkClient: NetworkRouting  // Создаем экземпляр сетевого клиента
+    init(networkClient: NetworkRouting = NetworkClient()) {
+        self.networkClient = networkClient
+    }
     
     // Конструируем URL для запроса списка популярных фильмов
     private var mostPopularMoviesUrl: URL {
