@@ -12,7 +12,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private var alertPresenter: AlertPresenter?
     private let presenter = MovieQuizPresenter()
     private var questionFactory: QuestionFactoryProtocol!
-    private var currentQuestion: QuizQuestion?
+    
     private var correctAnswers = 0
     //Создал экземпляр класса StatisticService
     private var statisticService: StatisticServiceProtocol = StatisticService()
@@ -39,7 +39,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         guard let question = question else {
             return
         }
-        currentQuestion = question
+        presenter.currentQuestion = question
         let viewModel = presenter.convert(model: question)
         DispatchQueue.main.async { [weak self] in
             self?.show(viewModel)
@@ -71,13 +71,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
     }
     
-    @IBAction private func noButtonTapped(_ sender: Any) {
-        showAnswerResult(false)
-    }
-    
-    @IBAction private func yesButtonTapped(_ sender: Any) {
-        showAnswerResult(true)
-    }
+   
     
     private func showNetworkError(message: String) {
         DispatchQueue.main.async { [weak self] in
@@ -114,8 +108,16 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         alertPresenter?.showAlert(model: alertModel)
     }
     
-    private func showAnswerResult(_ isCorrect: Bool) {
-        guard let currentQuestion = currentQuestion else {
+    @IBAction private func noButtonTapped(_ sender: Any) {
+        showAnswerResult(false)
+    }
+    
+    @IBAction private func yesButtonTapped(_ sender: Any) {
+        showAnswerResult(true)
+    }
+    
+     func showAnswerResult(_ isCorrect: Bool) {
+         guard let currentQuestion = presenter.currentQuestion else {
             return
         }
         
