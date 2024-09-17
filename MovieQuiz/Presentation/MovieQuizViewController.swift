@@ -1,17 +1,16 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController {
-    
+final class MovieQuizViewController: UIViewController, MovieQuizViewControllerProtocol {
     @IBOutlet weak var noButton: UIButton!
     @IBOutlet weak var yesButton: UIButton!
     @IBOutlet var imageView: UIImageView!
     @IBOutlet private var counterLabel: UILabel!
     @IBOutlet private var textLabel: UILabel!
     @IBOutlet var activityIndicator: UIActivityIndicatorView!
-    
+
     var alertPresenter: AlertPresenter?
     private var presenter: MovieQuizPresenter!
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -20,49 +19,70 @@ final class MovieQuizViewController: UIViewController {
         imageView.layer.cornerRadius = 20
         alertPresenter = AlertPresenter(viewController: self)
     }
-    
-    internal func hideLoadingIndicator() {
+
+    func highlightImageBorder(isCorrectAnswer: Bool) {
+        imageView.layer.masksToBounds = true
+        imageView.layer.borderWidth = 8
+        imageView.layer.borderColor = isCorrectAnswer ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
+    }
+
+    func hideLoadingIndicator() {
         DispatchQueue.main.async {
             self.activityIndicator.isHidden = true
+            self.activityIndicator.stopAnimating()
         }
     }
-    
-    internal func showLoadingIndicator() {
+
+    func showLoadingIndicator() {
         DispatchQueue.main.async {
             self.activityIndicator.isHidden = false
             self.activityIndicator.startAnimating()
         }
     }
-    
-     func showNetworkError(message: String) {
+
+    func showNetworkError(message: String) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            hideLoadingIndicator() // скрываем индикатор загрузки
+            self.hideLoadingIndicator()
             let model = AlertModel(title: "Ошибка зарузки данных",
                                    message: "Отсутствует интернет соединение",
                                    buttonText: "Попробовать ещё раз") { [weak self] in
                 guard let self = self else { return }
                 
-                presenter.currentQuestionIndex = 0
-                presenter.correctAnswers = 0
-                presenter.questionFactory.loadData()
+                self.presenter.currentQuestionIndex = 0
+                self.presenter.correctAnswers = 0
+                self.presenter.questionFactory.loadData()
             }
             self.alertPresenter?.showAlert(model: model)
         }
     }
-    
-     func show(_ step: QuizStepViewModel) {
+
+    func show(_ step: QuizStepViewModel) {
         imageView.image = step.image
         textLabel.text = step.question
         counterLabel.text = step.questionNumber
-        // Сбрасываем цвет рамки при показе нового вопроса
         imageView.layer.borderColor = UIColor.clear.cgColor
     }
-    
+
+    func showResult(quiz result: QuizResultsViewModel) {
+        let alertModel = AlertModel(
+            title: result.title,
+            message: result.text,
+            buttonText: result.buttonText) { [weak self] in
+                self?.presenter?.resetQuiz()
+            }
+        alertPresenter?.showAlert(model: alertModel)
+    }
+
+    func setButtonsEnabled(_ isEnabled: Bool) {
+        noButton.isEnabled = isEnabled
+        yesButton.isEnabled = isEnabled
+    }
+
     @IBAction private func noButtonTapped(_ sender: Any) {
         presenter.didAnswer(isYes: false)
     }
-    
+
     @IBAction private func yesButtonTapped(_ sender: Any) {
         presenter.didAnswer(isYes: true)
     }
