@@ -1,29 +1,20 @@
-//
-//  StubNetworkRouting.swift
-//  MovieQuiz
-//
-//  Created by Vitaly Wexler on 10.09.2024.
-//
-
 import Foundation
 
-
 struct StubNetworkClient: NetworkRouting {
-    
-    enum TestError: Error { // Тестовая ошибка
+    enum TestError: Error {
         case test
     }
     
-        let emulateError: Bool // этот параметр нужен, чтобы заглушка эмулировала либо ошибку сети, либо успешный ответ
-        func fetch(url: URL, handler: @escaping (Result<Data, Error>) -> Void) {
-            if emulateError {
-                handler(.failure(TestError.test))
-            } else {
-                handler(.success(expectedResponse))
-            }
+    let emulateError: Bool
+    func fetch(url: URL, handler: @escaping (Result<Data, Error>) -> Void) {
+        if emulateError {
+            handler(.failure(TestError.test))
+        } else {
+            handler(.success(expectedResponse))
         }
-        
-        private var expectedResponse: Data {
+    }
+    
+    private var expectedResponse: Data {
                 """
                 {
                    "errorMessage" : "",
@@ -55,6 +46,6 @@ struct StubNetworkClient: NetworkRouting {
                     ]
                   }
                 """.data(using: .utf8) ?? Data()
-        }
     }
+}
 

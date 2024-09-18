@@ -1,39 +1,35 @@
 import Foundation
 
 protocol MoviesLoading {
-    // Протокол для загрузки фильмов с определённым handler'ом
     func loadMovies(handler: @escaping (Result<MostPopularMovies, Error>) -> Void)
 }
 
 struct MoviesLoader: MoviesLoading {
     // MARK: - NetworkClient
-    private let networkClient: NetworkRouting  // Создаем экземпляр сетевого клиента
+    private let networkClient: NetworkRouting
     init(networkClient: NetworkRouting = NetworkClient()) {
         self.networkClient = networkClient
     }
     
-    // Конструируем URL для запроса списка популярных фильмов
     private var mostPopularMoviesUrl: URL {
         guard let url = URL(string: "https://tv-api.com/en/API/Top250Movies/k_zcuw1ytf") else {
-            preconditionFailure("Unable to construct mostPopularMoviesUrl") // Вызываем ошибку, если URL не удается создать
+            preconditionFailure("Unable to construct mostPopularMoviesUrl")
         }
         return url
     }
     
-    // Функция для загрузки фильмов
     func loadMovies(handler: @escaping (Result<MostPopularMovies, Error>) -> Void) {
         networkClient.fetch(url: mostPopularMoviesUrl) { result in
             switch result {
             case .success(let data):
                 do {
-                    // Декодируем полученные данные в экземпляр структуры MostPopularMovies
                     let mostPopularMovies = try JSONDecoder().decode(MostPopularMovies.self, from: data)
-                    handler(.success(mostPopularMovies)) // Передаем успешный результат с декодированными данными
+                    handler(.success(mostPopularMovies))
                 } catch {
-                    handler(.failure(error)) // Если декодирование не удалось, передаем ошибку
+                    handler(.failure(error))
                 }
             case .failure(let error):
-                handler(.failure(error)) // Передаем ошибку, возникшую при загрузке данных
+                handler(.failure(error))
             }
         }
     }

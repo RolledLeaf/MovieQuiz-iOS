@@ -1,16 +1,9 @@
 import Foundation
 import UIKit
 
-final class MovieQuizPresenter: QuestionFactoryDelegate {
-    func hideLoadingIndicator() {
-        
-    }
+final class MovieQuizPresenter: QuestionFactoryDelegate, MovieQuizPresenterProtocol {
     
-    func showLoadingIndicator() {
-        
-    }
-    
-    var viewController: MovieQuizViewControllerProtocol?
+    weak var viewController: MovieQuizViewControllerProtocol?
     var currentQuestionIndex = 0
     let questionsAmount: Int = 10
     var currentQuestion: QuizQuestion?
@@ -73,50 +66,47 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     }
     
     func showAnswerResult(_ isCorrect: Bool) {
-        guard let currentQuestion = self.currentQuestion else {
-            return
-        }
         if isCorrect {
-                correctAnswers += 1
+            correctAnswers += 1
             viewController?.highlightImageBorder(isCorrectAnswer: true)
-              } else {
-                  viewController?.highlightImageBorder(isCorrectAnswer: false)
-              }
-            viewController?.setButtonsEnabled(false) // Отключаем кнопки после ответа
+        } else {
+            viewController?.highlightImageBorder(isCorrectAnswer: false)
+        }
+        viewController?.setButtonsEnabled(false) // Отключаем кнопки после ответа
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+            guard let self = self else { return }
+            self.viewController?.setButtonsEnabled(true) // Включаем кнопки для следующего вопроса
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
-                guard let self = self else { return }
-                self.viewController?.setButtonsEnabled(true) // Включаем кнопки для следующего вопроса
+            if self.currentQuestionIndex == self.questionsAmount - 1 {
+                self.statisticService.store(correctAnswers: self.correctAnswers, totalQuestions: self.questionsAmount, date: Date())
                 
-                if self.currentQuestionIndex == self.questionsAmount - 1 {
-                    self.statisticService.store(correctAnswers: self.correctAnswers, totalQuestions: self.questionsAmount, date: Date())
-                    
-                    let gamesCount = self.statisticService.gamesCount
-                    let bestGame = self.statisticService.bestGame
-                    let totalAccuracy = String(format: "%.2f", self.statisticService.totalAccuracy)
-                    
-                    let dateFormatter = DateFormatter()
-                    dateFormatter.dateFormat = "dd.MM.yyyy HH:mm"
-                    let formattedDate = dateFormatter.string(from: bestGame.date)
-                    
-                    let text = """
+                let gamesCount = self.statisticService.gamesCount
+                let bestGame = self.statisticService.bestGame
+                let totalAccuracy = String(format: "%.2f", self.statisticService.totalAccuracy)
+                
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "dd.MM.yyyy HH:mm"
+                let formattedDate = dateFormatter.string(from: bestGame.date)
+                
+                let text = """
                 Ваш результат: \(self.correctAnswers)/10
                 Количесвто отыгранных квизов: \(gamesCount)
                 Рекорд: \(bestGame.correctAnswers)/\(bestGame.totalQuestions), \(formattedDate)
                 Средняя точность: \(totalAccuracy)%
                 """
-                    let viewModel = QuizResultsViewModel(
-                        title: "Этот раунд окончен!",
-                        text: text,
-                        buttonText: "Сыграть ещё раз"
-                    )
-                    self.viewController?.showResult(quiz: viewModel)
-                } else {
-                    self.currentQuestionIndex += 1
-                    self.viewController?.showLoadingIndicator()
-                    self.questionFactory.requestNextQuestion()
-                }
+                let viewModel = QuizResultsViewModel(
+                    title: "Этот раунд окончен!",
+                    text: text,
+                    buttonText: "Сыграть ещё раз"
+                )
+                self.viewController?.showResult(quiz: viewModel)
+            } else {
+                self.currentQuestionIndex += 1
+                self.viewController?.showLoadingIndicator()
+                self.questionFactory.requestNextQuestion()
             }
         }
     }
+}
 

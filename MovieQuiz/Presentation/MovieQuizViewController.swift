@@ -3,12 +3,12 @@ import UIKit
 final class MovieQuizViewController: UIViewController, MovieQuizViewControllerProtocol {
     @IBOutlet weak var noButton: UIButton!
     @IBOutlet weak var yesButton: UIButton!
-    @IBOutlet var imageView: UIImageView!
+    @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var counterLabel: UILabel!
     @IBOutlet private var textLabel: UILabel!
-    @IBOutlet var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet private var activityIndicator: UIActivityIndicatorView!
 
-    var alertPresenter: AlertPresenter?
+    private var alertPresenter: AlertPresenter?
     private var presenter: MovieQuizPresenter!
 
     override func viewDidLoad() {

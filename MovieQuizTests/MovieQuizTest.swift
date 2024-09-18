@@ -1,4 +1,3 @@
-
 import XCTest
 @testable import MovieQuiz
 
@@ -6,7 +5,6 @@ final class MovieQuizViewControllerMock: MovieQuizViewControllerProtocol {
     func setButtonsEnabled(_ isEnabled: Bool) {
         
     }
-    
     
     func show(_ step: QuizStepViewModel) {
         
@@ -32,6 +30,7 @@ final class MovieQuizViewControllerMock: MovieQuizViewControllerProtocol {
         
     }
 }
+
 final class MovieQuizPresenterTests: XCTestCase {
     func testPresenterConvertModel() throws {
         let viewControllerMock = MovieQuizViewControllerMock()
