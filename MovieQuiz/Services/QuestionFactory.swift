@@ -57,10 +57,7 @@ final class QuestionFactory: QuestionFactoryProtocol {
                 imageData = try Data(contentsOf: movie.imageURL)
             } catch {
                 print("Failed to load image")
-                let alertModel = AlertModel(title: "Image loading error",
-                                            message: "Failed to load image",
-                                            buttonText: "Try again",
-                                            completion: requestNextQuestion)
+                
             }
             let rating = Float(movie.rating) ?? 0
             let text = "Рейтинг фильма \(movie.title) больше 7?"
