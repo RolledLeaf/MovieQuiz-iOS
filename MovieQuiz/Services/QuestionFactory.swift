@@ -57,17 +57,39 @@ final class QuestionFactory: QuestionFactoryProtocol {
                 imageData = try Data(contentsOf: movie.imageURL)
             } catch {
                 print("Failed to load image")
-                
             }
-            let rating = Float(movie.rating) ?? 0
-            let text = "Рейтинг фильма \(movie.title) больше 7?"
-            let correctAnswer = rating > 7
-            let question = QuizQuestion(image: imageData, text: text, correctAnswer: correctAnswer)
+            
+            let actualRating = Float(movie.rating) ?? 0
+            // Сгенерируем случайное число для вопроса: на 1.0 меньше или на 0.5 больше реального рейтинга
+            let randomOffset: Float = Bool.random() ? -1.0 : 0.5
+            let comparisonRating = (actualRating + randomOffset).rounded(toPlaces: 1)
+            
+            // Определим, будет ли вопрос "больше" или "меньше"
+            let isGreaterComparison = Bool.random()
+            let questionText: String
+
+            if isGreaterComparison {
+                questionText = "Рейтинг  \(movie.title) больше, чем \(comparisonRating)?"
+            } else {
+                questionText = "Рейтинг  \(movie.title) меньше, чем \(comparisonRating)?"
+            }
+            
+            // Определим правильный ответ
+            let correctAnswer = isGreaterComparison ? (actualRating > comparisonRating) : (actualRating < comparisonRating)
+            let question = QuizQuestion(image: imageData, text: questionText, correctAnswer: correctAnswer)
+            
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.delegate?.didReceiveNextQuestion(question: question)
                 self.delegate?.hideLoadingIndicator()
             }
         }
+    }
+}
+
+extension Float {
+    func rounded(toPlaces places: Int) -> Float {
+        let divisor = pow(10.0, Float(places))
+        return (self * divisor).rounded() / divisor
     }
 }
