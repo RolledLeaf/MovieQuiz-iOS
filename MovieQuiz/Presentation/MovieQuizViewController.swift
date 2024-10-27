@@ -10,10 +10,15 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
 
     private var alertPresenter: AlertPresenter?
     private var presenter: MovieQuizPresenter!
-
+    
+    func configugeTextLabel() {
+        textLabel.adjustsFontSizeToFitWidth = true
+        textLabel.minimumScaleFactor = 0.5 // Минимальный масштаб 50% от оригинального размера шрифта
+        textLabel.numberOfLines = 2 // Убедитесь, что текст не переносится на следующую строку
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        configugeTextLabel()
         presenter = MovieQuizPresenter(viewController: self)
         showLoadingIndicator()
         imageView.layer.cornerRadius = 20

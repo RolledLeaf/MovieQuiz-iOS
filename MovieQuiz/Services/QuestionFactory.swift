@@ -4,6 +4,7 @@ final class QuestionFactory: QuestionFactoryProtocol {
     weak var delegate: QuestionFactoryDelegate?
     private let moviesLoader: MoviesLoading
     private var movies: [MostPopularMovie] = []
+    private var askedQuestionIndices: Set<Int> = []
     
     init(delegate: QuestionFactoryDelegate?, moviesLoader: MoviesLoading) {
         self.delegate = delegate
@@ -48,43 +49,55 @@ final class QuestionFactory: QuestionFactoryProtocol {
         DispatchQueue.main.async { [weak self] in
             self?.delegate?.showLoadingIndicator()
         }
+        
         DispatchQueue.global().async { [weak self] in
-            guard let self = self else { return }
-            let index = (0..<self.movies.count).randomElement() ?? 0
-            guard let movie = self.movies[safe: index] else { return }
-            var imageData = Data()
-            do {
-                imageData = try Data(contentsOf: movie.imageURL)
-            } catch {
-                print("Failed to load image")
-            }
-            
-            let actualRating = Float(movie.rating) ?? 0
-            // Сгенерируем случайное число для вопроса: на 1.0 меньше или на 0.5 больше реального рейтинга
-            let randomOffset: Float = Bool.random() ? -1.0 : 0.5
-            let comparisonRating = (actualRating + randomOffset).rounded(toPlaces: 1)
-            
-            // Определим, будет ли вопрос "больше" или "меньше"
-            let isGreaterComparison = Bool.random()
-            let questionText: String
-
-            if isGreaterComparison {
-                questionText = "Рейтинг  \(movie.title) больше, чем \(comparisonRating)?"
-            } else {
-                questionText = "Рейтинг  \(movie.title) меньше, чем \(comparisonRating)?"
-            }
-            
-            // Определим правильный ответ
-            let correctAnswer = isGreaterComparison ? (actualRating > comparisonRating) : (actualRating < comparisonRating)
-            let question = QuizQuestion(image: imageData, text: questionText, correctAnswer: correctAnswer)
-            
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                self.delegate?.didReceiveNextQuestion(question: question)
-                self.delegate?.hideLoadingIndicator()
-            }
-        }
-    }
+                  guard let self = self else { return }
+                  
+                  // Если все фильмы использованы, очищаем список
+                  if self.askedQuestionIndices.count == self.movies.count {
+                      self.askedQuestionIndices.removeAll()
+                  }
+                  
+                  // Выбираем случайный индекс, который еще не был использован
+                  var index: Int
+                  repeat {
+                      index = (0..<self.movies.count).randomElement() ?? 0
+                  } while self.askedQuestionIndices.contains(index)
+                  
+                  // Добавляем индекс в список заданных вопросов
+                  self.askedQuestionIndices.insert(index)
+                  
+                  guard let movie = self.movies[safe: index] else { return }
+                  
+                  var imageData = Data()
+                  do {
+                      imageData = try Data(contentsOf: movie.imageURL)
+                  } catch {
+                      print("Failed to load image")
+                  }
+                  
+                  let actualRating = Float(movie.rating) ?? 0
+                  let randomOffset: Float = Bool.random() ? -1.0 : 0.5
+                  let comparisonRating = (actualRating + randomOffset).rounded(toPlaces: 1)
+                  let isGreaterComparison = Bool.random()
+                  let questionText: String
+                  
+                  if isGreaterComparison {
+                      questionText = "Рейтинг фильма \(movie.title) больше, чем \(comparisonRating)?"
+                  } else {
+                      questionText = "Рейтинг фильма \(movie.title) меньше, чем \(comparisonRating)?"
+                  }
+                  
+                  let correctAnswer = isGreaterComparison ? (actualRating > comparisonRating) : (actualRating < comparisonRating)
+                  let question = QuizQuestion(image: imageData, text: questionText, correctAnswer: correctAnswer)
+                  
+                  DispatchQueue.main.async { [weak self] in
+                      guard let self = self else { return }
+                      self.delegate?.didReceiveNextQuestion(question: question)
+                      self.delegate?.hideLoadingIndicator()
+                  }
+              }
+          }
 }
 
 extension Float {
