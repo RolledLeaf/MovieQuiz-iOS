@@ -16,7 +16,7 @@
 - XCTest
 
 ## Screenshots
-<img src="Screenshots/1.png" width="300"> <img src="Screenshots/2.png" width="300">
+<img src="Screenshots/3.png" width="300"> <img src="Screenshots/4.png" width="300">
 
 ## Installation
 Open `MovieQuiz.xcodeproj` and run the app on iPhone Simulator (iOS 17.5+).
