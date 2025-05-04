@@ -149,8 +149,8 @@
 				B0687A522C85C26D008918BF /* Network Client.swift */,
 				B0687A562C85DDC2008918BF /* MoviesLoader.swift */,
 				B0D4D5772C906E17007DA523 /* StubNetworkRouting.swift */,
-				B0DC90562C99F3920019DB86 /* MovieQuizViewControllerProtocol.swift */,
 				B014AE762C9AF64F0074ADCE /* MovieQuizPresenterProtocol.swift */,
+				B0DC90562C99F3920019DB86 /* MovieQuizViewControllerProtocol.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";

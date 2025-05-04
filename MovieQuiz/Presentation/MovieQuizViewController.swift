@@ -13,8 +13,8 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
     
     func configugeTextLabel() {
         textLabel.adjustsFontSizeToFitWidth = true
-        textLabel.minimumScaleFactor = 0.5 // Минимальный масштаб 50% от оригинального размера шрифта
-        textLabel.numberOfLines = 2 // Убедитесь, что текст не переносится на следующую строку
+        textLabel.minimumScaleFactor = 0.5 // Минимальный масштаб от оригинального размера шрифта
+        textLabel.numberOfLines = 2 // количество строк для переноса
     }
     override func viewDidLoad() {
         super.viewDidLoad()
