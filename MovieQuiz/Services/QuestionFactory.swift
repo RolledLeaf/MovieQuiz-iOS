@@ -83,9 +83,9 @@ final class QuestionFactory: QuestionFactoryProtocol {
                   let questionText: String
                   
                   if isGreaterComparison {
-                      questionText = "Рейтинг фильма \(movie.title) больше, чем \(comparisonRating)?"
+                      questionText = "Is rating of \(movie.title) more than \(comparisonRating)?"
                   } else {
-                      questionText = "Рейтинг фильма \(movie.title) меньше, чем \(comparisonRating)?"
+                      questionText = "Is rating of \(movie.title) less than \(comparisonRating)?"
                   }
                   
                   let correctAnswer = isGreaterComparison ? (actualRating > comparisonRating) : (actualRating < comparisonRating)

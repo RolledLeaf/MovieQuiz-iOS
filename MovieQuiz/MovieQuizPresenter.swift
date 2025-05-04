@@ -90,15 +90,15 @@ final class MovieQuizPresenter: QuestionFactoryDelegate, MovieQuizPresenterProto
                 let formattedDate = dateFormatter.string(from: bestGame.date)
                 
                 let text = """
-                Ваш результат: \(self.correctAnswers)/10
-                Количесвто отыгранных квизов: \(gamesCount)
-                Рекорд: \(bestGame.correctAnswers)/\(bestGame.totalQuestions), \(formattedDate)
-                Средняя точность: \(totalAccuracy)%
+                Your result: \(self.correctAnswers)/10
+                Rounds played: \(gamesCount)
+                Record: \(bestGame.correctAnswers)/\(bestGame.totalQuestions), \(formattedDate)
+                Average accuracy: \(totalAccuracy)%
                 """
                 let viewModel = QuizResultsViewModel(
-                    title: "Этот раунд окончен!",
+                    title: "This round is over!",
                     text: text,
-                    buttonText: "Сыграть ещё раз"
+                    buttonText: "Play again"
                 )
                 self.viewController?.showResult(quiz: viewModel)
             } else {
